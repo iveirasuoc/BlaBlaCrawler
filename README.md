@@ -28,18 +28,15 @@ pip install time
 pip install sys
 ```
 
-Una vez instaladas las librerías necesarias podremos llamar al programa de dos maneras posibles:
+Una vez instaladas las librerías necesarias podremos llamar al programa de dos maneras diferentes:
 
-- En el caso de que queramos reproducir la misma búsqueda con la que se obtuvo el csv **blablacar_extraccion_viajes.csv**, deberemos ejecutar el script de la siguiente manera, en donde los parámetros de entrada son, por orden, origen, destino, asientos, fecha de origen, límite de páginas y fecha máxima del viaje:
+- En el caso de que queramos reproducir la misma búsqueda* con la que se obtuvo el csv **blablacar_extraccion_viajes.csv**, deberemos ejecutar el script de la siguiente manera, en donde los parámetros de entrada son, por orden, origen, destino, asientos, fecha de origen y límite de páginas:
 ```rubi
-python main.py Madrid Cualquiera 1 2019-04-17 Cualquiera 2019-04-17
+python main.py Madrid Cualquiera 1 2019-04-17 Cualquiera
 ```
 - En el caso de querer cambiar los parámetros de búsqueda de viajes, podemos llamar simplemente al script y te irá proponiendo por pantalla los posibles filtros que se pueden utilizar:
 ```rubi
 python main.py
 ```
 
-
-
-
-
+_*Cabe notar que aún repitiendo la búsqueda con los mismo parámetros de entrada, debido a la volatilidad de los viajes en BlaBlaCar, difíclmente se puede obtener exactamente el mismo resultado._
