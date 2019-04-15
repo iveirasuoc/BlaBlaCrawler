@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Creación de funciones necesarias para la ejecución de un Crawler en la página de BlablaCar.
-
     -consultar_viajes: consigue un pandas DataFrame a partir de los datos aportados (soup).
     
     -extr_blabla: se encarga de realizar las llamadas a la página web de BlablaCar
@@ -105,7 +104,8 @@ def consultar_viajes(soup, datos):
 
 
 # Función que descarga las páginas de BlaBlaCar y extrae información relevante
-def extr_blabla(seats = 1, dep_date = '2019-04-15', dep = 'Madrid', arr = '',lim_paginas=100, de='2019-04-17'):
+def extr_blabla(seats = 1, dep_date = '2019-04-15', dep = 'Madrid', arr = '', 
+                lim_paginas = 200):
     # Inicializamos el set de datos
     blablaset = pd.DataFrame()
     # Inicializamos la página de búsqueda a 1 y el límite de páginas a 100
@@ -117,10 +117,10 @@ def extr_blabla(seats = 1, dep_date = '2019-04-15', dep = 'Madrid', arr = '',lim
         'Accept-Language': 'gl-GL,gl;q=0.8,en-US;q=0.5,en;q=0.3'}
     url_blablacar = 'https://www.blablacar.es/search?'
     # Iteramos por las páginas de búsqueda
-    while pag < lim_paginas:
+    while pag <= lim_paginas:
         # Definimos las características de la petición url y la construimos
         url_pet = {'seats': seats, 'db': dep_date, 'departure_city': dep, 
-                   'arrival_city': arr, 'page': str(pag), 'de': de}
+                   'arrival_city': arr, 'page': str(pag)}
         url_total = url_blablacar + urllib.parse.urlencode(
                 url_pet, quote_via = urllib.parse.quote)
         # Realizamos la petición url y la convertimos con BeautifulSoup
@@ -129,6 +129,7 @@ def extr_blabla(seats = 1, dep_date = '2019-04-15', dep = 'Madrid', arr = '',lim
         # Comprobamos si ya no hay viajes en la página para detener el bucle
         pag_error = soup.find('h1', {'class':'kirk-title py-xl w-full'})
         if pag_error != None:
+            print(u'Extracción finalizada')
             break
         else:
             # Mostramos por pantalla la página extraída y la extraemos
@@ -139,14 +140,16 @@ def extr_blabla(seats = 1, dep_date = '2019-04-15', dep = 'Madrid', arr = '',lim
             # Esperamos 1s para evitar que nos bloqueen y cambiamos de página
             time.sleep(1)
             pag += 1
-
-    # Si hemos extraído algún viaje, formateamos el nombre de las variables y el tipo de las numéricas
-    if pag > 1:
-        blablaset.columns = ['nombre', 'url', 'nombre_conductor', 'origen', 
-                             'fecha_salida', 'destino', 'fecha_llegada',
-                             'duracion', 'precio', 'distancia_origen', 
-                             'distancia_destino', 'auto_aceptacion',
-                             'dos_asientos_detras', 'conductor_con_foto']
-        blablaset.precio=blablaset.precio.astype(float)
-        blablaset.duracion=blablaset.duracion.astype(float)
+    # Si hemos extraído algún viaje, formateamos las variables
+    nombre_columnas = ['nombre', 'url', 'nombre_conductor', 'origen',
+                       'fecha_salida', 'destino', 'fecha_llegada', 'duracion', 
+                       'precio', 'distancia_origen', 'distancia_destino', 
+                       'auto_aceptacion','dos_asientos_detras', 
+                       'conductor_con_foto']
+    if pag == 1:
+        blablaset = pd.DataFrame(columns = nombre_columnas)
+    else:
+        blablaset.columns = nombre_columnas
+        blablaset.precio = blablaset.precio.astype(float)
+        blablaset.duracion= blablaset.duracion.astype(float)
     return blablaset
