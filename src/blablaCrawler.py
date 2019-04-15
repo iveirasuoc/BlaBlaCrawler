@@ -105,12 +105,11 @@ def consultar_viajes(soup, datos):
 
 
 # Función que descarga las páginas de BlaBlaCar y extrae información relevante
-def extr_blabla(seats = 1, dep_date = '2019-04-15', dep = 'Madrid', arr = ''):
+def extr_blabla(seats = 1, dep_date = '2019-04-15', dep = 'Madrid', arr = '',lim_paginas=100, de='2019-04-17'):
     # Inicializamos el set de datos
     blablaset = pd.DataFrame()
     # Inicializamos la página de búsqueda a 1 y el límite de páginas a 100
     pag = 1
-    lim_paginas = 100
     # Definimos el header de la consulta y la raíz de la url
     header = {'User-Agent': 
         'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) ' + 
@@ -121,7 +120,7 @@ def extr_blabla(seats = 1, dep_date = '2019-04-15', dep = 'Madrid', arr = ''):
     while pag < lim_paginas:
         # Definimos las características de la petición url y la construimos
         url_pet = {'seats': seats, 'db': dep_date, 'departure_city': dep, 
-                   'arrival_city': arr, 'page': str(pag)}
+                   'arrival_city': arr, 'page': str(pag), 'de': de}
         url_total = url_blablacar + urllib.parse.urlencode(
                 url_pet, quote_via = urllib.parse.quote)
         # Realizamos la petición url y la convertimos con BeautifulSoup
@@ -130,7 +129,6 @@ def extr_blabla(seats = 1, dep_date = '2019-04-15', dep = 'Madrid', arr = ''):
         # Comprobamos si ya no hay viajes en la página para detener el bucle
         pag_error = soup.find('h1', {'class':'kirk-title py-xl w-full'})
         if pag_error != None:
-            print(u'Extracción finalizada')
             break
         else:
             # Mostramos por pantalla la página extraída y la extraemos
@@ -142,11 +140,13 @@ def extr_blabla(seats = 1, dep_date = '2019-04-15', dep = 'Madrid', arr = ''):
             time.sleep(1)
             pag += 1
 
-    # Si hemos extraído algún viaje, formateamos el nombre de las variables
+    # Si hemos extraído algún viaje, formateamos el nombre de las variables y el tipo de las numéricas
     if pag > 1:
         blablaset.columns = ['nombre', 'url', 'nombre_conductor', 'origen', 
                              'fecha_salida', 'destino', 'fecha_llegada',
                              'duracion', 'precio', 'distancia_origen', 
                              'distancia_destino', 'auto_aceptacion',
                              'dos_asientos_detras', 'conductor_con_foto']
+        blablaset.precio=blablaset.precio.astype(float)
+        blablaset.duracion=blablaset.duracion.astype(float)
     return blablaset
